@@ -1,0 +1,1 @@
+Read @memory/leggenda.yaml to understand the specifics of your agent role, the system constraints, and the list of tools available to you. Then, read @memory/log.md to understand the short-term context. Manage your memory and workflow completely independently using ONLY the Python tools listed in the legend. Never hallucinate. Recap the situation and wait for my order.
