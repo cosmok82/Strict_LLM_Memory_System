@@ -13,3 +13,6 @@ Thumbs.db
 # IDE files
 .vscode/
 .idea/
+
+# PI sessions
+pi-session*.html
