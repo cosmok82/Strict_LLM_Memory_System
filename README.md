@@ -1,3 +1,5 @@
+![thumbnail](thumbnail.png)
+
 # Strict LLM Memory System
 
 This project was born from a personal and professional need: to optimize the use of LLMs in complex, long-term work contexts. Those who work daily with these models know well that the main challenge isn't just code generation, but managing memory and controlling tokens.
