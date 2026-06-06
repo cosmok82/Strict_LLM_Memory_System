@@ -16,3 +16,9 @@ Thumbs.db
 
 # PI sessions
 pi-session*.html
+
+# GUI config
+config.json
+
+# RAR backups
+*.rar

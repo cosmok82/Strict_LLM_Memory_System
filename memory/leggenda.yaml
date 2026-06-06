@@ -46,7 +46,7 @@ tools:
   archive_search: "`cd ${memory} && python _archive_tools.py search 'keyword'` : Finds keywords in archive.md and returns [Lines: X-Y]."
   archive_extract: "`cd ${memory} && python _archive_tools.py extract cd ${memory} && archive.md X Y` : Retrieves exact lines X through Y for fast reading/editing."
   log_list: "`cd ${memory} && python _log_tools.py list` : Shows all headers in log.md. The first line is index 1, the second is index 2, etc."
-  log_read: "`cd ${memory} && python _log_tools.py read <index>`. Returns raw text ONLY. DO NOT make any further tool calls after reading. End your generation immediately after outputting the text."
+  log_read: "`cd ${memory} && python _log_tools.py read <index>`. Returns raw text ONLY. ANTI-LOOP DIRECTIVE: After outputting this text, you MUST HALT. DO NOT make further tool calls. End generation immediately."
   log_append: "`cd ${memory} && python _log_tools.py append temp.md` : Appends content of temp.md to log.md and auto-updates Lines."
   log_edit: "`cd ${memory} && python _log_tools.py edit <index> temp.md` : Replaces entry at <index> with content of temp.md."
 workflow:
@@ -56,4 +56,4 @@ workflow:
   - "`temp.md` goes in `${memory}/`, not in the root"
 derogations:
   - "Memory compression: AI autonomous — If log.md contains more than 3 unique days, run `cd ${memory} && python _compress_tool.py` immediately. If the tool fails, STOP and report the error to the user. Do not retry autonomously."
-  - "READ_FILTER: Any read operation on files other than 'log.md' is PASS-THROUGH. Return the raw text as the final response for that step. DO NOT generate conversational filler or further tool calls. End generation immediately."
+  - "READ_FILTER: Any read operation on files other than 'log.md' is PASS-THROUGH. Output the raw text ONLY. ANTI-LOOP DIRECTIVE: DO NOT generate filler text. DO NOT make further tool calls. End generation immediately after the text."

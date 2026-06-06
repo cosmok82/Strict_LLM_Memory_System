@@ -203,3 +203,31 @@ All tools validated on 2026-06-04. Results below:
 | Attachments         | ✅ All attachments files exist                          |
 | Workflow rules      | ✅ All enforced by tools                                |
 | **Overall**         | ✅ **SYSTEM VALIDATED**                                 |
+
+---
+
+### 🛠️ SOTA Prompt Compiler GUI
+
+**Overview**
+The SOTA Prompt Compiler is a lightweight, local Python GUI built with `Tkinter` and `PyYAML`. It dynamically parses a YAML system prompt (the "Legend") and generates a strict, read-only UI where structure and syntax are protected from accidental edits. Added full UI customization, persistent settings, and dynamic management of attachment lists.
+
+**Key Features**
+
+- **Dynamic YAML Parsing:** Translates any YAML structure into structured visual labels and text blocks without hardcoding.
+- **Read-Only Enforced:** Text fields are locked by default to preserve exact spacing, line breaks, and SOTA prompting rules.
+- **Theme Selector:** Switch between 4 carefully designed themes (Light, Dark, Solarized Light, Solarized Dark) directly from the top toolbar.
+- **Font Selector:** Customize the UI typography with a choice of 8 professional fonts (Consolas, Courier New, Helvetica, Arial, Segoe UI, Tahoma, Verdana, Calibri).
+- **Persistent Configuration:** Theme and font preferences are automatically saved to `config.json` in the working directory and restored on next launch.
+- **Attachment Management:**
+  - Each entry in the `attachments:` section now includes `+` and `−` buttons.
+  - Click `+` to insert a new blank attachment template directly below the current row.
+  - Click `−` to remove the current attachment row (minimum of one row enforced).
+  - All current edits are preserved automatically during add/remove operations.
+- **Contextual Interactive Tags:**
+  - Clicking `<placeholder>.md` ➜ Opens a targeted File Explorer. Automatically applies a cascade update, replacing the `.md` string with the file name, and any surrounding `<placeholder>` tags with the file's base name (e.g., `[file](file.md)`).
+  - Clicking `<placeholder>` ➜ Opens a text input dialog to manually inject variables.
+  - Clicking `<description>` ➜ Opens a text input dialog to manually type context/descriptions.
+- **Safe Export:** Collects all updated variables and exports a clean, ready-to-deploy `.yaml` prompt file.
+
+**Configuration File (`config.json`)**
+The GUI automatically creates and maintains a `config.json` file in the same directory as your YAML legend.
