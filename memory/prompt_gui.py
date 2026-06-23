@@ -622,9 +622,11 @@ class PromptEditorApp:
 
 
 if __name__ == "__main__":
-    test_yaml = "leggenda.yaml"
+    # Default: leggenda.yaml. Pass a YAML path as argv[1] to edit another legend
+    # e.g. python prompt_gui.py leggendaGemma.yaml
+    test_yaml = sys.argv[1] if len(sys.argv) > 1 else "leggenda.yaml"
     if not os.path.exists(test_yaml):
-        print(f"Error: Save your leggenda in {test_yaml} before launching the editor.")
+        print(f"Error: {test_yaml} not found. Usage: python prompt_gui.py [legend.yaml]")
     else:
         root = tk.Tk()
         app = PromptEditorApp(root, test_yaml)

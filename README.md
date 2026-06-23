@@ -18,29 +18,46 @@ It provides short-term and long-term memory storage with strict format rules, au
 
 ## LLM Compatibility
 
-This system is **LLM-agnostic**. It works with any LLM that supports tool calling (function calling). Tested with `qwen/qwen3.6-35b-a3b`, but compatible with any model supporting the tool calling interface.
+This system is **LLM-agnostic**. It works with any LLM that supports tool calling (function calling). Tested with `qwen/qwen3.6-35b-a3b` (Gemma4 26B also supported via its dedicated legend variant), but compatible with any model supporting the tool calling interface.
 
 The only dependency is **Python 3 standard library** — no external libraries required.
 
 ## Deployment
 
-To use this memory system in a working project, simply copy the `memory/` folder to the project root and configure `leggenda.yaml` with your project-specific values (replacing all `<placeholder>` markers).
+To use this memory system in a working project, simply copy the `memory/` folder to the project root and configure `leggenda.yaml` with your project-specific values (replacing all `<placeholder>` markers). For Gemma4-class models, use `leggendaGemma.yaml` instead (see [Legend Variants](#legend-variants) below).
 
 ### System Agent Prompt
 
-A ready-to-use system prompt is included: `memory/SystemAgentPrompt.txt`. Use it as the system prompt for your agent at startup. It instructs the agent to read `leggenda.yaml`, manage memory via tools, and follow all workflow rules.
+A ready-to-use system prompt is included: `memory/SystemAgentPrompt.txt`. Use it as the system prompt for your agent at startup. It instructs the agent to read the legend (`@memory/leggenda.yaml`, auto-loaded as a file mention), read short-term context from `./memory/log.md` via the Python memory tools, manage memory via tools, and follow all workflow rules. Replies are in Italian.
+
+## Legend Variants
+
+Two optimized legends are provided, both configurable via the GUI and sharing the same structure, tools, and workflow:
+
+| Legend | Target | Tokens | Notes |
+|--------|--------|--------|-------|
+| `leggenda.yaml` | Qwen3.6 35B / any capable local LLM | ~1 019 | General-purpose, imperative rules, nested `entry_rules` mapping. |
+| `leggendaGemma.yaml` | Gemma4 26B / smaller-context models | ~973 | Flattened, self-contained imperatives; same `tools` section, fewer nested structures. |
+
+Token counts are measured with a cl100k-base tokenizer. The legend is loaded once per session, so every token saved here pays off across the whole run — the primary lever for low-VRAM local inference.
+
+**Path convention:** the startup prompt loads the legend with `@memory/leggenda.yaml` (a file mention, auto-injected into context at boot) but reads `log.md` as `./memory/log.md` via the Python tools. This keeps `log.md` from being bulk-ingested, respecting the `CONTEXT_LIMIT` rule and the tool-based memory workflow.
 
 ## Architecture
 
 ```
 leggenda.yaml          ← System specification (rules, tools, format, workflow)
+├── leggendaGemma.yaml  ← Flattened variant for Gemma4-class models (see Legend Variants)
+├── SystemAgentPrompt.txt ← Startup system prompt (references the legend + log.md)
 ├── log.md             ← Short-term memory (max 3 unique days, append-only)
 ├── archive.md         ← Long-term memory (read-only, accessed via tools)
-├── Attachment1.md     ← document 1 attached to the project
-├── Attachment2.md     ← document 2 attached to the project
+├── Attachment1.md     ← EXAMPLE: replace with your own project attachment
+├── Attachment2.md     ← EXAMPLE: replace with your own project attachment
 ├── _log_tools.py      ← Log management CLI
 ├── _archive_tools.py  ← Archive search & extract CLI
 ├── _compress_tool.py  ← Compression CLI
+├── prompt_gui.py      ← SOTA Prompt Compiler GUI (edits any legend)
+└── config.json        ← GUI theme/font preferences (auto-generated)
 ```
 
 ## Template Placeholders in `leggenda.yaml`
@@ -215,6 +232,7 @@ The SOTA Prompt Compiler is a lightweight, local Python GUI built with `Tkinter`
 
 **Key Features**
 
+- **Legend Selector:** Launch with an optional path argument to edit any legend, e.g. `python prompt_gui.py leggendaGemma.yaml`. Defaults to `leggenda.yaml`.
 - **Dynamic YAML Parsing:** Translates any YAML structure into structured visual labels and text blocks without hardcoding.
 - **Read-Only Enforced:** Text fields are locked by default to preserve exact spacing, line breaks, and SOTA prompting rules.
 - **Theme Selector:** Switch between 4 carefully designed themes (Light, Dark, Solarized Light, Solarized Dark) directly from the top toolbar.
