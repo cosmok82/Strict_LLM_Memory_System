@@ -8,6 +8,16 @@ environment:
   sw_platform: "<placeholder>"
   hw_access: "NO remote/SSH/execution. USER compiles/executes HIL. AI NEVER compiles."
   tool_prefix: "Run every memory tool as: `cd ./memory && python <tool>` (cd does not persist between calls)."
+
+# HALT RULES — read FIRST, enforce ALWAYS (primacy):
+halt_rules:
+  - "STAY IN ROOT. NEVER LEAVE ${root}."
+  - "DESTRUCTIVE ACTION → ASK PERMISSION. (delete, modify core code, unknown bash)."
+  - "TOOL ERROR OR 0 RESULTS (2 attempts) → STOP. NO DEBUG. NO LOOP. REPORT + ASK."
+  - "ARCHIVE SEARCH → 0 RESULTS → STOP. NO next-steps, NO 'cercherò in log.md', NO 'prossimi passi', NO filler. REPORT + ASK USER."
+  - "NEVER edit log.md/archive.md directly. ONLY via tools."
+  - "NEVER delete/reorder entries manually. Use _compress_tool.py."
+
 memory:
   log: "./memory/log.md (Short-term context. Max 3 unique days. Append-only.)"
   archive: "./memory/archive.md (Long-term. Read-only. Access via tools.)"
@@ -17,19 +27,30 @@ memory:
     new_day: "If date missing: write to ./memory/temp.md, run `python _log_tools.py append temp.md`."
     existing_day: "If date exists: run `python _log_tools.py read <index>`, add `### Subsection` before TO DOs, save to ./memory/temp.md, run `python _log_tools.py edit <index> temp.md`."
     style: "Subsections for files/bugs. Bullets. Emojis (✅, ❌, ⚠️, 📝). Links: [<placeholder>.md](<placeholder>.md)."
+
 rules:
-  - "SAFE ACTIONS: execute non-destructive ops (read, search/extract archive, write ./memory/temp.md, create NEW files, run memory tools) WITHOUT asking permission."
-  - "DESTRUCTIVE ACTIONS: HALT and ASK PERMISSION before deleting files, modifying unrequested core code, or running unknown bash commands."
-  - "User question: READ/SEARCH to answer. NO writes."
-  - "User order ('fix', 'crea', 'modifica'): execute full workflow (read -> write temp -> update log -> modify file) unless RESTRICTED."
-  - "Ambiguous input: READ to clarify, but ASK permission before writing."
-  - "NEVER delete or reorder entries manually. Use tools for compression."
+  - "SAFE ACTIONS → AUTONOMOUS: read, search/extract archive, write ./memory/temp.md, create NEW files, run memory tools. NO permission needed."
+  - "User question → READ/SEARCH to answer. NO writes."
+  - "User order ('fix','crea','modifica') → execute full workflow (read → write temp → update log → modify file) unless RESTRICTED."
+  - "Ambiguous input → READ to clarify, ASK permission before writing."
   - "CONTEXT_LIMIT: max 50 lines per Pi `read`. Use _log_tools.py for full log.md entries."
-  - "TOOL_FAILURE: on tool error or no results after 2 attempts, STOP. Do NOT debug, do NOT loop. Report and ask user."
   - "CMake: tests need add_executable + target_link_libraries in tests/CMakeLists.txt."
   - "Code: SOTA2026 + Doxygen (English). Link requirements: [<placeholder>.md](<placeholder>.md)."
+
+# AUTO-RECAP — forces conscious attention before acting (with example for Gemma4):
+recap:
+  - "BEFORE any write or tool call, emit ONE line: `PLAN: <tool> → <file> → <perché>`. Then act. NO action without PLAN."
+  - "EXAMPLE: `PLAN: _log_tools.py append → temp.md → nuova entry per bug fix`"
+
 attachments:
   - "[<placeholder>](./memory/<placeholder>.md): <description>"
+
+workflow:
+  - "ALWAYS write entries to ./memory/temp.md first, then use append/edit tools. NEVER edit log.md directly."
+  - "If stuck, search archive/read attachments for context WITHOUT asking permission."
+  - "temp.md belongs in ./memory/, NOT root."
+
+# TOOLS — at END (recency: consulted every action):
 tools:
   compression: "_compress_tool.py : moves old entries to archive.md, updates [Lines: X-Y]."
   archive_search: "_archive_tools.py search 'keyword' : finds keywords in archive.md, returns headers + [Lines: X-Y]."
@@ -38,10 +59,11 @@ tools:
   log_read: "_log_tools.py read <index> : returns full entry text."
   log_append: "_log_tools.py append temp.md : appends temp.md to log.md, auto-reindexes Lines."
   log_edit: "_log_tools.py edit <index> temp.md : replaces entry at <index> with temp.md, auto-reindexes."
-workflow:
-  - "ALWAYS write entries to ./memory/temp.md first, then use append/edit tools. NEVER edit log.md directly."
-  - "If stuck, search archive/read attachments for context WITHOUT asking permission."
-  - "temp.md belongs in ./memory/, NOT root."
+
 derogations:
   - "Memory compression: if log.md > 3 unique days, run _compress_tool.py. If it fails: STOP, report. NO auto-retry."
   - "READ_FILTER: reads on non-log.md files are PASS-THROUGH. Output raw text ONLY. ANTI-LOOP: NO filler, NO further tool calls, HALT after the text."
+
+# HALT RULES — repeat at END (recency, compressed to 3 fatal rules for Gemma4 small context):
+halt_rules_end:
+  - "STAY IN ROOT. DESTRUCTIVE → ASK. TOOL ERROR/0 RESULTS → STOP, NO DEBUG, NO LOOP, NO NEXT-STEPS, NO FILLER. PLAN BEFORE EVERY ACTION."

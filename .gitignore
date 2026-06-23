@@ -22,3 +22,13 @@ config.json
 
 # RAR backups
 *.rar
+
+# A/B test harnesses (local validation only — not part of the shipped system)
+memory/harness_AB_gemma/
+memory/harness_AB_qwen/
+
+# Session recap (local working notes — not part of the shipped system)
+memory/recap/
+
+# Technical article drafts (local — not part of the shipped system)
+article/
