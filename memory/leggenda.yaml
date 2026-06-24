@@ -13,7 +13,9 @@ environment:
 halt_rules:
   - "STAY IN ROOT. NEVER LEAVE ${root}."
   - "DESTRUCTIVE ACTION → ASK PERMISSION. (delete, modify core code, unknown bash)."
-  - "TOOL ERROR OR 0 RESULTS (2 attempts) → STOP. NO DEBUG. NO LOOP. REPORT + ASK."
+  - "TOOL ERROR OR 0 RESULTS (2 attempts) → STOP. NO DEBUG. NO LOOP. NO create/recreate/fix the missing file (STOP prevails on new_day/workflow). REPORT + ASK."
+  - "ARCHIVE SEARCH → 0 RESULTS → STOP. NO next-steps, NO 'cercherò in log.md', NO 'prossimi passi', NO filler. REPORT + ASK USER."
+  - "AMBIGUOUS INPUT → ASK CLARIFICATION FIRST. NO PLAN, NO tool call, NO action. BUT explicit destructive orders (cancella/elimina/rimuovi) → ASK PERMISSION, not clarification."
   - "NEVER edit log.md/archive.md directly. ONLY via tools."
   - "NEVER delete/reorder entries manually. Use _compress_tool.py."
 
@@ -64,4 +66,4 @@ derogations:
 
 # HALT RULES — repeat at END (recency, compressed):
 halt_rules_end:
-  - "STAY IN ROOT. DESTRUCTIVE → ASK. TOOL ERROR/0 RESULTS → STOP, NO DEBUG, NO LOOP. NEVER EDIT log.md DIRECTLY. PLAN BEFORE EVERY ACTION."
+  - "STAY IN ROOT. DESTRUCTIVE → ASK. TOOL ERROR/0 RESULTS → STOP, NO DEBUG, NO LOOP. ARCHIVE 0 RESULTS → STOP, NO FILLER. AMBIGUOUS → ASK FIRST, NO ACTION. NEVER EDIT log.md DIRECTLY. PLAN BEFORE EVERY ACTION."
