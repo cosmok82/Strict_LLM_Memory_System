@@ -3,11 +3,11 @@ variables:
   root: "C:/<path>"
   memory: "memory"
 environment:
-  root_directory: "${root} (STRICTLY operate ONLY here. NEVER leave. Files outside memory/ are RAW_DATA: read-only, never processed/compressed.)"
+  root_directory: "${root} (STRICTLY operate ONLY here. NEVER leave. Files outside ${memory}/ are RAW_DATA: read-only, never processed/compressed.)"
   hw_platform: "<placeholder>"
   sw_platform: "<placeholder>"
   hw_access: "NO remote/SSH/execution. USER compiles/executes HIL. AI NEVER compiles."
-  tool_prefix: "Run every memory tool as: `cd ./memory && python <tool>` (cd does not persist between calls)."
+  tool_prefix: "Run every memory tool as: `cd ./${memory} && python <tool>` (cd does not persist between calls)."
 
 # HALT RULES — read FIRST, enforce ALWAYS (primacy):
 halt_rules:
@@ -20,17 +20,17 @@ halt_rules:
   - "NEVER delete/reorder entries manually. Use _compress_tool.py."
 
 memory:
-  log: "./memory/log.md (Short-term context. Max 3 unique days. Append-only. Read for context.)"
-  archive: "./memory/archive.md (Long-term. Read-only. Access via tools.)"
+  log: "./${memory}/log.md (Short-term context. Max 3 unique days. Append-only. Read for context.)"
+  archive: "./${memory}/archive.md (Long-term. Read-only. Access via tools.)"
   format: "Chronological (oldest top, newest bottom). Header: `## [YYYY-MM-DD] — Short Title [Lines: X-Y]` (X=first line, Y=last line). Body: `### Subsection` + bullets."
   entry_rules:
     date: "Today's date (YYYY-MM-DD). log.md entries MUST be unique: same date + title = duplicate."
-    new_day: "If date missing: write entry to ./memory/temp.md, run `python _log_tools.py append temp.md`."
-    existing_day: "If date exists: run `python _log_tools.py read <index>`, add `### Subsection` before TO DOs, save to ./memory/temp.md, run `python _log_tools.py edit <index> temp.md`."
+    new_day: "If date missing: write entry to ./${memory}/temp.md, run `python _log_tools.py append temp.md`."
+    existing_day: "If date exists: run `python _log_tools.py read <index>`, add `### Subsection` before TO DOs, save to ./${memory}/temp.md, run `python _log_tools.py edit <index> temp.md`."
     style: "Subsections for files/bugs. Bullets. Emojis (✅, ❌, ⚠️, 📝). Markdown links: [<placeholder>.md](<placeholder>.md)."
 
 rules:
-  - "SAFE ACTIONS → AUTONOMOUS: read, search/extract archive, write ./memory/temp.md, create NEW files, run memory tools. NO permission needed."
+  - "SAFE ACTIONS → AUTONOMOUS: read, search/extract archive, write ./${memory}/temp.md, create NEW files, run memory tools. NO permission needed."
   - "User question → READ/SEARCH to answer. NO writes."
   - "User order ('fix','crea','modifica') → execute full workflow (read → write temp → update log → modify file) unless RESTRICTED."
   - "Ambiguous input → READ to clarify, ASK permission before writing."
@@ -43,12 +43,12 @@ recap:
   - "BEFORE any write or tool call, emit ONE line: `PLAN: <tool> → <file> → <perché>`. Then act. NO action without PLAN."
 
 attachments:
-  - "[<placeholder>](./memory/<placeholder>.md): <description>"
+  - "[<placeholder>](./${memory}/<placeholder>.md): <description>"
 
 workflow:
-  - "ALWAYS write new/edited entries to ./memory/temp.md first, then use append/edit tools. NEVER edit log.md directly."
+  - "ALWAYS write new/edited entries to ./${memory}/temp.md first, then use append/edit tools. NEVER edit log.md directly."
   - "If stuck, autonomously search archive/read attachments for context WITHOUT asking permission."
-  - "temp.md belongs in ./memory/, NOT root."
+  - "temp.md belongs in ./${memory}/, NOT root."
 
 # TOOLS — at END (recency: consulted every action):
 tools:
