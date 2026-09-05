@@ -36,12 +36,49 @@ Two optimized legends are provided, both configurable via the GUI and sharing th
 
 | Legend | Version | Target | Tokens | Notes |
 |--------|---------|--------|--------|-------|
-| `leggenda.yaml` | v2.0 | Qwen3.6 35B / any capable local LLM | ~1 303 | General-purpose, imperative rules, nested `entry_rules` mapping; v2.0 adds targeted halt rules (tool failure, empty archive search, ambiguous input) for attention adherence. |
+| `leggenda.yaml` | **v2.1** | Qwen3.6 35B / any capable local LLM | ~1 300 | General-purpose, imperative rules, nested `entry_rules` mapping; v2.0 added targeted halt rules (tool failure, empty archive search, ambiguous input). **v2.1 (promoted to production on 05/09/2026 after the harness validation campaign): 3 targeted rule refinements** — date = newest log entry, answers only after verify+read, ambiguous → ask immediately (see [Validation Campaign 05/09/2026](#validation-campaign-05092026--harness-memory-models) below). `leggenda_nextgen.yaml` is kept as an alias (same content). |
 | `leggendaGemma.yaml` | **v2.0** | Gemma4 26B / smaller-context models | ~1 226 | Flattened, self-contained imperatives; tuned for attention adherence on smaller-context models (see [Gemma4 Legend v2.0](#gemma4-legend-v20--attention-adherence) below). |
 
 Token counts are measured with a cl100k-base tokenizer. The legend is loaded once per session, so tokens here pay off across the whole run — the primary lever for low-VRAM local inference. Where a legend grows to enforce stricter behavior (see the [Gemma4 v2.0](#gemma4-legend-v20--attention-adherence) note below), the extra tokens are a deliberate trade of raw economy for adherence.
 
 **Path convention:** the startup prompt loads the legend with `@memory/leggenda.yaml` (a file mention, auto-injected into context at boot) but reads `log.md` as `./memory/log.md` via the Python tools. This keeps `log.md` from being bulk-ingested, respecting the `CONTEXT_LIMIT` rule and the tool-based memory workflow.
+
+## Validation Campaign 05/09/2026 — harness memory × models
+
+A dedicated **frozen harness** (10-task battery, 2 repetitions × run, temperature 0.3, local llama.cpp servers) was used to validate the memory system against the newest local models. The harness runs model + memory WITHOUT any external agent (tools executed by the harness itself), task by task over sandboxed project copies. Full campaign history and artifacts (reports, transcripts, comparison matrix) live in the companion harness workspace.
+
+### Obstacles overcome
+
+1. **Stall-loops on empty results** (models at `thinking off`): repeated identical tool calls (read of empty `temp.md`, `log_list` ×12) with no action and no final answer. The harness flags these as critical `retry_loop` (leggenda rule "0 RESULTS (2 attempts) → STOP" violated).
+2. **Internal contradiction in v2.0**: the `rules` section said "Ambiguous input → READ to clarify" while `halt_rules` say "NO tool call, NO action" — models followed the wrong line and gathered context before asking (documented weak probe of the family, 20% on Qwen3.6).
+3. **Missing "today" date**: models without a calendar tool refused to write entries ("I won't hallucinate the date") or invented one; the leggenda did not state where the date comes from.
+4. **Answers from memory alone**: on verification questions the models answered from conversation context instead of re-reading via the tools (leggenda workflow violation).
+5. **Platform crash (llama.cpp)**: the server's LCP prompt-similarity slot picker crashed silently (`f_keep < 1` path, WinError 10054) on similar-but-different system prompts. Root-caused and fixed with `--slot-prompt-similarity 0` (documented in the platform benchmark notes).
+
+### Solutions adopted
+
+- **leggenda v2.1 — 3 targeted rule refinements** (no structural change, ~same token cost):
+  1. `entry_rules.date`: "Today's date = the date of the NEWEST entry in log.md (the log always ends today)" — resolves the missing-calendar problem.
+  2. `rules → User question`: "ALWAYS verify by READING the relevant entry (log_read) or SEARCHING archive BEFORE answering. NEVER answer from memory alone."
+  3. `rules → Ambiguous input`: aligned with the halt rules + concrete example: "ASK CLARIFICATION FIRST, IMMEDIATELY, with a short question (max 2 lines). NO reads, NO log_list, NO plan, NO tool call, NO action."
+- **Harness tooling**: root-boundary enforcement, relative paths only, `--slot-prompt-similarity 0` on servers, orchestration with level-rerun on server death.
+- Original v2.0 leggenda archived for rollback.
+
+### Results per configuration (adherence, 20 runs per cell)
+
+| Model × level | v2.0 | v2.1 | FAIL-flags (v2.1) | t08 tenacity (v2.1) |
+|---|---:|---:|---:|---:|
+| Qwen3.8-27B · off | 74% | ⬜ not re-run | — | — |
+| Qwen3.8-27B · low | 89% | **100%** 🏆 | 0 | 12/12 |
+| Qwen3.8-27B · medium | 88% | ⬜ not re-run | — | — |
+| Flash-Next-UNC mmproj · off | 38% | 61% | 2 | 3/12 |
+| Flash-Next-UNC mmproj · low | 82% | 92% | 1 | 12/12 |
+| Flash-Next-UNC mmproj · medium | 75% | **95%** 🏆 | 0 | 12/12 |
+| Flash-Next-UNC mtp · off | 45% | 68% | 0 | 2/12 |
+| Flash-Next-UNC mtp · low | 85% | 82% | 0 | 12/12 |
+| Flash-Next-UNC mtp · medium | 80% | 90% | 0 | 12/12 |
+
+Reading: the v2.1 ambiguous-input fix holds across the whole family (0 tool calls on the ambiguous probe at every level); `low`/`medium` thinking levels keep perfect long-session tenacity (12/12); the flash family needs thinking enabled (off collapses, t08 ≤ 3/12) — the opposite of the 27B, where `off` was the best for tenacity. Best combinations: **27B@low-v2.1 (100%)** and **Flash mmproj@medium-v2.1 (95%)**.
 
 ## Gemma4 Legend v2.0 — Attention Adherence
 
