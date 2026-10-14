@@ -32,3 +32,6 @@ memory/recap/
 
 # Technical article drafts (local — not part of the shipped system)
 article/
+
+# Technical design drafts (local — not part of the shipped system)
+design/
