@@ -1,8 +1,7 @@
 ---
 layout: default
 title: Strict LLM Memory System — study and code
-description: LLM-agnostic structured memory for agentic work. Attention-adherence study: 63% → 100% (Gemma4 26B) and 63% → 87% (Qwen3.6 35B), no fine-tuning, no RAG.
-image: https://raw.githubusercontent.com/cosmok82/Strict_LLM_Memory_System/master/thumbnail.png
+description: "LLM-agnostic structured memory for agentic work. Attention-adherence study: 63% → 100% (Gemma4 26B) and 63% → 87% (Qwen3.6 35B), no fine-tuning, no RAG."
 ---
 
 # Strict LLM Memory System
