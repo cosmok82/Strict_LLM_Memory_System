@@ -1,4 +1,5 @@
 title: Strict LLM Memory System
+author: Cosimo Orlando
 description: LLM-agnostic structured memory for agentic work — prompt contract + Python CLI tools, with an empirical attention-adherence study.
 url: https://cosmok82.github.io
 baseurl: /Strict_LLM_Memory_System

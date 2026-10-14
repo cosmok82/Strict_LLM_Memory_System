@@ -3,6 +3,8 @@ layout: default
 title: Attention Adherence in a Structured LLM Memory System
 description: Empirical study on local inference — legend rule adherence raised from 63% to 100% (Gemma4 26B) and 63% to 87% (Qwen3.6 35B). No fine-tuning, no RAG.
 og_type: article
+date: 2026-10-14
+author: Cosimo Orlando
 ---
 
 # Attention Adherence in a Structured LLM Memory System
