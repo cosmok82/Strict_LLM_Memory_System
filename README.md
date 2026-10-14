@@ -217,9 +217,9 @@ All tools are Python CLI scripts. **No external libraries required** — only Py
 | `list`                   | Show all entry headers in `log.md`                | `python _log_tools.py list`           |
 | `read <index>`           | Read full entry at `<index>` (1-based)            | `python _log_tools.py read 1`         |
 | `append <temp.md>`       | Append content of temp file to `log.md`           | `python _log_tools.py append temp.md` |
-| `edit <index> <temp.md>` | Replace entry at `<index>` with temp file content | `python _log_tools.py edit 1 temp.md` |
+| `edit <temp.md>`        | Write stdin draft to `temp.md` (ONLY legal target)  | `python _log_tools.py edit temp.md << 'EOF' … EOF`     |
 
-**Workflow**: Always write new/edited entries to `temp.md` first, then use `append` or `edit`. Never edit `log.md` directly.
+**Workflow**: Always draft via `edit temp.md` (stdin), then `append`. Memory files (`log.md`, `archive.md`, `temp.md`) are only ever written by the memory tools — never by hand or with the agent file-editor. The memory is **progressive**: entries are never rewritten after commit; corrections are new entries (same date, different title).
 
 ### `python _archive_tools.py`
 
@@ -244,13 +244,12 @@ All tools are Python CLI scripts. **No external libraries required** — only Py
 2. Run `python _log_tools.py append temp.md`
 3. Tools auto-update line numbers
 
-### Editing an Existing Entry (Existing Day)
+### Updating an Existing Day (New Entry)
 
-1. Run `python _log_tools.py read <index>` to get current entry
-2. Insert new `### Subsection` at bottom (before TO DOs)
-3. Save to `temp.md`
-4. Run `python _log_tools.py edit <index> temp.md`
-5. Tools auto-update line numbers
+1. Run `python _log_tools.py read <index>` to get today's entry context
+2. Write a NEW entry to `temp.md` via stdin draft (same date, DIFFERENT title)
+3. Run `python _log_tools.py append temp.md`
+4. Tools auto-update line numbers
 
 ### Compression
 

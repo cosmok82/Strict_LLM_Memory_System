@@ -165,37 +165,28 @@ def append_entry(file_path: str) -> str:
     save_log_entries(entries)
     return "New entry added successfully to the bottom of log.md. Indices recalculated."
 
-def edit_entry(index: int, file_path: str) -> str:
+def edit_draft(targets: list) -> str:
     """
-    @brief Replaces entry at index with content from a temp file.
-    @param index The 1-based index of the entry to replace.
-    @param file_path Path to the temp file containing the corrected entry.
-    @return Success message or error message.
+    @brief Writes the stdin draft to temp.md (the ONLY editable memory file).
+    @param targets The target file argument(s). MUST be exactly [temp.md]; any other
+           target (log.md, archive.md, old 'edit <index> <file>' habits) is refused
+           with an instructive message instead of a cryptic argparse error.
+    @return Success message or instructive refusal message.
     """
-    if not os.path.exists(file_path):
-        return f"Error: File {file_path} not found."
-        
-    entries = get_log_entries()
-    if index < 1 or index > len(entries):
-        return f"Error: Index {index} invalid."
+    if [os.path.basename(t) for t in targets] != ["temp.md"]:
+        return ("Operation not allowed: edit works ONLY on temp.md. "
+                "log.md/archive.md are PROGRESSIVE memory, NEVER rewritten. "
+                "Corrections = NEW entry: run append temp.md.")
 
-    with open(file_path, "r", encoding="utf-8") as f:
-        new_content = f.read().strip()
-
+    new_content = sys.stdin.read().strip()
+    if not new_content:
+        return "Error: empty draft (stdin)."
     if not re.match(r'^## \[\d{4}-\d{2}-\d{2}\]', new_content):
         return "Error: Content must start with '## [YYYY-MM-DD]'."
 
-    new_date, new_title = extract_title_and_date(new_content)
-    if not new_date:
-        return "Error: Unable to extract date from header."
-
-    # Check for duplicates excluding the current entry
-    if is_duplicate(new_date, new_title, entries, exclude_index=index-1):
-        return f"Error: Duplicate entry for {new_date} with title '{new_title}'. Already present in log.md."
-
-    entries[index-1] = new_content
-    save_log_entries(entries)
-    return "Entry modified successfully. Indices recalculated."
+    with open("temp.md", "w", encoding="utf-8") as f:
+        f.write(new_content)
+    return "Draft written to temp.md. Ready: run append temp.md."
 
 
 if __name__ == "__main__":
@@ -214,9 +205,8 @@ if __name__ == "__main__":
     append_parser.add_argument("file", type=str, help="Temp file containing the new entry")
     
     # edit
-    edit_parser = subparsers.add_parser("edit", help="Replace entry N with file content")
-    edit_parser.add_argument("index", type=int, help="Entry index to modify")
-    edit_parser.add_argument("file", type=str, help="Temp file containing the corrected entry")
+    edit_parser = subparsers.add_parser("edit", help="Write the stdin draft to temp.md (ONLY temp.md is a legal target)")
+    edit_parser.add_argument("file", nargs="*", help="Target file (must be temp.md)")
 
     args = parser.parse_args()
 
@@ -227,6 +217,6 @@ if __name__ == "__main__":
     elif args.command == "append":
         print(append_entry(args.file))
     elif args.command == "edit":
-        print(edit_entry(args.index, args.file))
+        print(edit_draft(args.file))
     else:
         parser.print_help()
