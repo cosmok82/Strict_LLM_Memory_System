@@ -10,6 +10,10 @@ The solution I developed allows the LLM to efficiently store and retrieve contex
 
 The project is continuously evolving: if you encounter any bugs or have suggestions, I invite you to report them to me. I am very committed to continuously improving this tool.
 
+> **📄 Study — Attention Adherence in a Structured LLM Memory System**
+> Legend rule adherence raised from **63% → 100%** (Gemma4 26B) and **63% → 87%** (Qwen3.6 35B), measured on a behavioural probe battery. No fine-tuning, no RAG.
+> [Read the article (EN)](docs/ARTICLE_EN.md) · [Announcement](https://github.com/cosmok82/Strict_LLM_Memory_System/discussions/2)
+
 ## Overview
 
 The Strict LLM Memory System is a structured, tool-driven knowledge management system for the autonomous C/System Developer AI that worked on software structured projects, without particurarly requirements, for the AI agent and inference server; driven by a system prompt.
