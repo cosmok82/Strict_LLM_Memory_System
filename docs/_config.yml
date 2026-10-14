@@ -1,0 +1,11 @@
+title: Strict LLM Memory System
+description: LLM-agnostic structured memory for agentic work — prompt contract + Python CLI tools, with an empirical attention-adherence study.
+url: https://cosmok82.github.io
+baseurl: /Strict_LLM_Memory_System
+markdown: kramdown
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
